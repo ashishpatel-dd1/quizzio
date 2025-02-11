@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'animated_particles.dart';
 import 'category_selection_page.dart';
 
-void main() => runApp(const Quizzio());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Lock the app in portrait mode
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Allow only portrait mode
+  ]).then((_) {
+    runApp(const Quizzio());
+  });
+}
 
 class Quizzio extends StatelessWidget {
   const Quizzio({super.key});
