@@ -25,7 +25,7 @@ class TriviaManager {
 
     _questionBank.shuffle(Random());
 
-    if (questionLimit > 0 && questionLimit < _questionBank.length) {
+    if (questionLimit > 0 && questionLimit < _questionBank.length - 1 ) {
       _questionBank = _questionBank.sublist(0, questionLimit);
     }
   }
