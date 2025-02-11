@@ -53,7 +53,7 @@ class _QuizPageState extends State<QuizPage> {
             Navigator.pop(context);
           },
           color: Colors.green,
-          child: const Text("Restart Quiz", style: TextStyle(color: Colors.white, fontSize: 16)),
+          child: const Text("Restart Quiz", style: TextStyle(color: Colors.white, fontSize: 15)),
         ),
         DialogButton(
           onPressed: () {
@@ -61,7 +61,7 @@ class _QuizPageState extends State<QuizPage> {
             Navigator.pop(context);
           },
           color: Colors.red,
-          child: const Text("Home", style: TextStyle(color: Colors.white, fontSize: 16)),
+          child: const Text("Home", style: TextStyle(color: Colors.white, fontSize: 15)),
         ),
       ],
     ).show();

@@ -25,14 +25,34 @@ class TriviaManager {
 
     _questionBank.shuffle(Random());
 
-    if (questionLimit > 0 && questionLimit < _questionBank.length - 1 ) {
-      _questionBank = _questionBank.sublist(0, questionLimit);
+    // Ensure we don't try to get more questions than available
+    if (questionLimit > _questionBank.length) {
+      questionLimit = _questionBank.length; // Limit to available questions
     }
+
+    _questionBank = _questionBank.sublist(0, questionLimit);
+    _currentQuestionIndex = 0; // Reset index after loading questions
   }
 
-  String getQuestionText() => _questionBank[_currentQuestionIndex].questionText;
-  bool getCorrectAnswer() => _questionBank[_currentQuestionIndex].questionAnswer;
+  String getQuestionText() {
+    if (_questionBank.isEmpty) return "No questions available.";
+    return _questionBank[_currentQuestionIndex].questionText;
+  }
 
-  bool nextQuestion() => ++_currentQuestionIndex < _questionBank.length - 1;
-  void restartQuiz() => _currentQuestionIndex = 0;
+  bool getCorrectAnswer() {
+    if (_questionBank.isEmpty) return false;
+    return _questionBank[_currentQuestionIndex].questionAnswer;
+  }
+
+  bool nextQuestion() {
+    if (_currentQuestionIndex + 1 < _questionBank.length) {
+      _currentQuestionIndex++;
+      return true;
+    }
+    return false; // No more questions left
+  }
+
+  void restartQuiz() {
+    _currentQuestionIndex = 0;
+  }
 }
