@@ -1,11 +1,12 @@
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'trivia_manager.dart';
 
 class QuizPage extends StatefulWidget {
   final String selectedCategory;
+  final int questionCount;
 
-  const QuizPage({super.key, required this.selectedCategory});
+  const QuizPage({super.key, required this.selectedCategory, required this.questionCount});
 
   @override
   _QuizPageState createState() => _QuizPageState();
@@ -18,21 +19,19 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
-    triviaManager.loadTrivia(widget.selectedCategory);
+    triviaManager.loadTrivia(widget.selectedCategory, widget.questionCount);
   }
 
   void checkAnswer(bool userAnswer) {
     bool correctAnswer = triviaManager.getCorrectAnswer();
 
     setState(() {
-      if (userAnswer == correctAnswer) {
-        scoreKeeper.add(const Icon(Icons.check, color: Colors.green, size: 30));
-      } else {
-        scoreKeeper.add(const Icon(Icons.close, color: Colors.red, size: 30));
-      }
+      scoreKeeper.add(
+        Icon(userAnswer == correctAnswer ? Icons.check : Icons.close, color: userAnswer == correctAnswer ? Colors.green : Colors.red, size: 30),
+      );
 
       if (!triviaManager.nextQuestion()) {
-        showCompletionAlert(); // Show alert when quiz finishes
+        showCompletionAlert();
       }
     });
   }
@@ -42,11 +41,8 @@ class _QuizPageState extends State<QuizPage> {
       context: context,
       type: AlertType.success,
       title: "Quiz Completed!",
-      desc: "You've completed the quiz. What would you like to do next?",
-      style: AlertStyle(
-        isOverlayTapDismiss: false, // Prevent accidental dismiss
-        descStyle: const TextStyle(fontSize: 16), // Adjust description size
-      ),
+      desc: "Your Score: ${scoreKeeper.where((icon) => icon.color == Colors.green).length}/${widget.questionCount}",
+      style: AlertStyle(isOverlayTapDismiss: false, descStyle: const TextStyle(fontSize: 14)),
       buttons: [
         DialogButton(
           onPressed: () {
@@ -54,31 +50,22 @@ class _QuizPageState extends State<QuizPage> {
               triviaManager.restartQuiz();
               scoreKeeper.clear();
             });
-            Navigator.pop(context); // Close alert
+            Navigator.pop(context);
           },
-          width: 150, // Adjust width
           color: Colors.green,
-          child: const Text(
-            "Restart Quiz",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          child: const Text("Restart Quiz", style: TextStyle(color: Colors.white, fontSize: 16)),
         ),
         DialogButton(
           onPressed: () {
-            Navigator.pop(context); // Close alert
-            Navigator.pop(context); // Go back to home screen
+            Navigator.pop(context);
+            Navigator.pop(context);
           },
-          width: 150, // Adjust width
           color: Colors.red,
-          child: const Text(
-            "Home", // Shorter text fits better
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
+          child: const Text("Home", style: TextStyle(color: Colors.white, fontSize: 16)),
         ),
       ],
     ).show();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -87,94 +74,47 @@ class _QuizPageState extends State<QuizPage> {
       appBar: AppBar(
         backgroundColor: Colors.grey.shade900,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(
-          widget.selectedCategory,
-          style: const TextStyle(color: Colors.white, fontSize: 20),
-        ),
+        title: Text(widget.selectedCategory, style: const TextStyle(color: Colors.white, fontSize: 20)),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              flex: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: triviaManager.getQuestionText(),
-                        style: const TextStyle(
-                          fontSize: 25.0,
-                          color: Colors.white,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.all(15.0),
-                  ),
-                  onPressed: () => checkAnswer(true),
-                  child: const Text(
-                    'True',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.all(15.0),
-                  ),
-                  onPressed: () => checkAnswer(false),
-                  child: const Text(
-                    'False',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: scoreKeeper,
-              ),
-            ),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildQuestionSection(),
+            _buildAnswerButton(true, Colors.green),
+            _buildAnswerButton(false, Colors.red),
+            _buildScoreKeeper(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildQuestionSection() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Center(
+        child: Text(triviaManager.getQuestionText(), style: const TextStyle(fontSize: 22.0, color: Colors.white), textAlign: TextAlign.center),
+      ),
+    );
+  }
+
+  Widget _buildAnswerButton(bool isTrue, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: TextButton(
+        style: TextButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.all(15.0)),
+        onPressed: () => checkAnswer(isTrue),
+        child: Text(isTrue ? 'True' : 'False', style: const TextStyle(color: Colors.white, fontSize: 18.0)),
+      ),
+    );
+  }
+
+  Widget _buildScoreKeeper() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: scoreKeeper),
     );
   }
 }

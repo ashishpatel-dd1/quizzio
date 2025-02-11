@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'quiz_page.dart';
+import 'category_selection_page.dart';
 
 void main() => runApp(const Quizzio());
 
@@ -9,8 +9,8 @@ class Quizzio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,  // Removes debug banner
-      home: HomeScreen(), // Ensures Navigator is available
+      debugShowCheckedModeBanner: false,
+      home: const HomeScreen(),
     );
   }
 }
@@ -28,42 +28,18 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Select Quiz Category',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                'Welcome to Quizzio!',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizPage(selectedCategory: 'Science'),
-                    ),
+                    MaterialPageRoute(builder: (context) => CategorySelectionPage()),
                   );
                 },
-                child: const Text('Science Trivia'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizPage(selectedCategory: 'History'),
-                    ),
-                  );
-                },
-                child: const Text('History Trivia'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizPage(selectedCategory: 'Sports'),
-                    ),
-                  );
-                },
-                child: const Text('Sports Trivia'),
+                child: const Text('Start Quiz'),
               ),
             ],
           ),

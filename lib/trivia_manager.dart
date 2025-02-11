@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'question.dart';
-import 'science_trivia.dart'; // Example categories
+import 'science_trivia.dart';
 import 'history_trivia.dart';
 import 'sports_trivia.dart';
 
@@ -8,8 +8,7 @@ class TriviaManager {
   List<Question> _questionBank = [];
   int _currentQuestionIndex = 0;
 
-  // Load different question banks dynamically
-  void loadTrivia(String category) {
+  void loadTrivia(String category, int questionLimit) {
     switch (category.toLowerCase()) {
       case 'science':
         _questionBank = ScienceTrivia().getQuestions();
@@ -23,32 +22,17 @@ class TriviaManager {
       default:
         throw Exception("Invalid category: $category");
     }
-    shuffleQuestions();
-  }
 
-  void shuffleQuestions() {
     _questionBank.shuffle(Random());
-  }
 
-  String getQuestionText() {
-    return _questionBank[_currentQuestionIndex].questionText;
-  }
-
-  bool getCorrectAnswer() {
-    return _questionBank[_currentQuestionIndex].questionAnswer;
-  }
-
-  bool nextQuestion() {
-    if (_currentQuestionIndex < _questionBank.length - 1) {
-      _currentQuestionIndex++;
-      return true;
-    } else {
-      return false; // Quiz finished
+    if (questionLimit > 0 && questionLimit < _questionBank.length) {
+      _questionBank = _questionBank.sublist(0, questionLimit);
     }
   }
 
-  void restartQuiz() {
-    _currentQuestionIndex = 0;
-    shuffleQuestions();
-  }
+  String getQuestionText() => _questionBank[_currentQuestionIndex].questionText;
+  bool getCorrectAnswer() => _questionBank[_currentQuestionIndex].questionAnswer;
+
+  bool nextQuestion() => ++_currentQuestionIndex < _questionBank.length - 1;
+  void restartQuiz() => _currentQuestionIndex = 0;
 }
