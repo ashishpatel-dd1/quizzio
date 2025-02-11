@@ -1,3 +1,4 @@
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter/material.dart';
 import 'trivia_manager.dart';
 
@@ -12,8 +13,7 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   TriviaManager triviaManager = TriviaManager();
-  bool quizFinished = false;
-  List<Icon> scoreKeeper = []; // Stores correct/wrong answer icons
+  List<Icon> scoreKeeper = [];
 
   @override
   void initState() {
@@ -32,18 +32,53 @@ class _QuizPageState extends State<QuizPage> {
       }
 
       if (!triviaManager.nextQuestion()) {
-        quizFinished = true;
+        showCompletionAlert(); // Show alert when quiz finishes
       }
     });
   }
 
-  void restartQuiz() {
-    setState(() {
-      quizFinished = false;
-      triviaManager.restartQuiz();
-      scoreKeeper.clear(); // Reset the scorekeeper
-    });
+  void showCompletionAlert() {
+    Alert(
+      context: context,
+      type: AlertType.success,
+      title: "Quiz Completed!",
+      desc: "You've completed the quiz. What would you like to do next?",
+      style: AlertStyle(
+        isOverlayTapDismiss: false, // Prevent accidental dismiss
+        descStyle: const TextStyle(fontSize: 16), // Adjust description size
+      ),
+      buttons: [
+        DialogButton(
+          onPressed: () {
+            setState(() {
+              triviaManager.restartQuiz();
+              scoreKeeper.clear();
+            });
+            Navigator.pop(context); // Close alert
+          },
+          width: 150, // Adjust width
+          color: Colors.green,
+          child: const Text(
+            "Restart Quiz",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+        DialogButton(
+          onPressed: () {
+            Navigator.pop(context); // Close alert
+            Navigator.pop(context); // Go back to home screen
+          },
+          width: 150, // Adjust width
+          color: Colors.red,
+          child: const Text(
+            "Home", // Shorter text fits better
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      ],
+    ).show();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +114,7 @@ class _QuizPageState extends State<QuizPage> {
                     child: RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                        text: quizFinished
-                            ? "Quiz Completed!"
-                            : triviaManager.getQuestionText(),
+                        text: triviaManager.getQuestionText(),
                         style: const TextStyle(
                           fontSize: 25.0,
                           color: Colors.white,
@@ -93,58 +126,47 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
             ),
-            if (!quizFinished) ...[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.all(15.0),
-                    ),
-                    onPressed: () => checkAnswer(true),
-                    child: const Text(
-                      'True',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                      ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding: const EdgeInsets.all(15.0),
+                  ),
+                  onPressed: () => checkAnswer(true),
+                  child: const Text(
+                    'True',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
                     ),
                   ),
                 ),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.all(15.0),
-                    ),
-                    onPressed: () => checkAnswer(false),
-                    child: const Text(
-                      'False',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                      ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.all(15.0),
+                  ),
+                  onPressed: () => checkAnswer(false),
+                  child: const Text(
+                    'False',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
-            ],
-            // Show Restart Button when Quiz is Finished
-            if (quizFinished)
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ElevatedButton(
-                  onPressed: restartQuiz,
-                  child: const Text('Restart Quiz'),
-                ),
-              ),
-            // Scorekeeper Row
+            ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: scoreKeeper,
