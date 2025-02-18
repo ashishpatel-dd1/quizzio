@@ -11,28 +11,27 @@ class CategorySelectionPage extends StatefulWidget {
 
 class _CategorySelectionPageState extends State<CategorySelectionPage> {
   final List<Map<String, dynamic>> categories = [
-    {'name': 'Science', 'icon': Icons.science, 'color': Colors.blueAccent},
-    {'name': 'History', 'icon': Icons.history_edu, 'color': Colors.brown},
-    {'name': 'Sports', 'icon': Icons.sports_soccer, 'color': Colors.green},
+    {
+      'name': 'Science',
+      'icon': Icons.science,
+      'color': Colors.blueAccent,
+      'backgroundImage': "assets/backgrounds/atom-1674878_1280.webp"
+    },
+    {
+      'name': 'History',
+      'icon': Icons.history_edu,
+      'color': Colors.brown,
+      'backgroundImage': "assets/backgrounds/history.jpg"
+    },
+    {
+      'name': 'Sports',
+      'icon': Icons.sports_soccer,
+      'color': Colors.green,
+      'backgroundImage': "assets/backgrounds/sport.jpeg"
+    },
   ];
 
-  final List<Color> _backgroundColors = [Colors.deepPurple, Colors.black, Colors.indigo];
-  int _colorIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _startBackgroundAnimation();
-  }
-
-  void _startBackgroundAnimation() {
-    Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        _colorIndex = (_colorIndex + 1) % _backgroundColors.length;
-      });
-      _startBackgroundAnimation();
-    });
-  }
+  final Color _backgroundColor = Colors.black;
 
   void _showQuestionSelectionDialog(String category, Color categoryColor) {
     int selectedQuestions = 10;
@@ -46,15 +45,13 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // Glassmorphic Effect
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Color.fromARGB((0.2 * 255).toInt(), 255, 255, 255), // ✅ Fixed
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Color.fromARGB((0.3 * 255).toInt(), 255, 255, 255), // ✅ Fixed
-                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -66,40 +63,23 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
                     const SizedBox(height: 15),
                     StatefulBuilder(
                       builder: (context, setState) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade800,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withOpacity(0.4)),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int>(
-                              value: selectedQuestions,
-                              dropdownColor: Colors.grey.shade900,
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 28),
-                              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                              isExpanded: true,
-                              borderRadius: BorderRadius.circular(15),
-                              items: [5, 10, 15, 20, 25].map((int number) {
-                                return DropdownMenuItem<int>(
-                                  value: number,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                                    child: Text(
-                                      number.toString(),
-                                      style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (int? newValue) {
-                                setState(() {
-                                  selectedQuestions = newValue!;
-                                });
-                              },
-                            ),
-                          ),
+                        return DropdownButton<int>(
+                          value: selectedQuestions,
+                          dropdownColor: Colors.grey.shade900,
+                          icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 28),
+                          style: const TextStyle(color: Colors.white, fontSize: 18),
+                          isExpanded: true,
+                          items: [5, 10, 15, 20, 25].map((int number) {
+                            return DropdownMenuItem<int>(
+                              value: number,
+                              child: Text(number.toString(), style: const TextStyle(color: Colors.white)),
+                            );
+                          }).toList(),
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              selectedQuestions = newValue!;
+                            });
+                          },
                         );
                       },
                     ),
@@ -109,10 +89,7 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
                       children: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          style: TextButton.styleFrom(
-                            backgroundColor: Color.fromARGB((0.8 * 255).toInt(), 255, 82, 82), // ✅ Fixed
-                            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                          ),
+                          style: TextButton.styleFrom(backgroundColor: Colors.red.withOpacity(0.8)),
                           child: const Text("Cancel", style: TextStyle(color: Colors.white, fontSize: 16)),
                         ),
                         ElevatedButton(
@@ -121,15 +98,14 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    QuizPage(selectedCategory: category, questionCount: selectedQuestions),
+                                builder: (context) => QuizPage(
+                                  selectedCategory: category,
+                                  questionCount: selectedQuestions,
+                                ),
                               ),
                             );
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: categoryColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                          ),
+                          style: ElevatedButton.styleFrom(backgroundColor: categoryColor),
                           child: const Text("Start Quiz", style: TextStyle(color: Colors.white, fontSize: 16)),
                         ),
                       ],
@@ -144,41 +120,30 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        title: const Text("Choose a Quiz"),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Choose a Quiz", style: TextStyle(color: Colors.white)),
-        centerTitle: true,
       ),
-      body: AnimatedContainer(
-        duration: const Duration(seconds: 3),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              _backgroundColors[_colorIndex],
-              _backgroundColors[(_colorIndex + 1) % _backgroundColors.length]
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: categories.map((category) {
+      body: Container(
+        color: _backgroundColor,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          itemCount: categories.length,
+          itemBuilder: (context, index) {
+            var category = categories[index];
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
               child: GestureDetector(
                 onTap: () => _showQuestionSelectionDialog(category['name'], category['color']),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  height: 160,
+                  clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
-                    color: category['color'],
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
@@ -189,25 +154,55 @@ class _CategorySelectionPageState extends State<CategorySelectionPage> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Icon(category['icon'], color: Colors.white, size: 35),
-                      Text(
-                        category['name'],
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                      if (category.containsKey('backgroundImage'))
+                        Image.asset(
+                          category['backgroundImage'],
+                          fit: BoxFit.cover,
+                        ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: category['color'].withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Ensures proper alignment
+                          children: [
+                            // Category Name (VERTICAL) + Icon
+                            Row(
+                              children: [
+                                RotatedBox(
+                                  quarterTurns: 3,
+                                  child: Text(
+                                    category['name'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                //const SizedBox(width: 10), // Space between name and icon
+                                Icon(category['icon'], color: Colors.white, size: 35),
+                              ],
+                            ),
+
+                            // Arrow Icon aligned to the end
+                            const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 22),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             );
-          }).toList(),
+          },
         ),
       ),
     );

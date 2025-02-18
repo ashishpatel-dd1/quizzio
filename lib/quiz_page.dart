@@ -27,7 +27,11 @@ class _QuizPageState extends State<QuizPage> {
 
     setState(() {
       scoreKeeper.add(
-        Icon(userAnswer == correctAnswer ? Icons.check : Icons.close, color: userAnswer == correctAnswer ? Colors.green : Colors.red, size: 30),
+        Icon(
+          userAnswer == correctAnswer ? Icons.check : Icons.close,
+          color: userAnswer == correctAnswer ? Colors.green : Colors.red,
+          size: 30,
+        ),
       );
 
       if (!triviaManager.nextQuestion()) {
@@ -69,23 +73,41 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Set the background image based on category
+    String backgroundImage = widget.selectedCategory == 'Science'
+        ? 'assets/backgrounds/science.jpg'  // Add your science background image here
+        : '';
+
     return Scaffold(
       backgroundColor: Colors.grey.shade900,
       appBar: AppBar(
         backgroundColor: Colors.grey.shade900,
         elevation: 0,
-        title: Text(widget.selectedCategory, style: const TextStyle(color: Colors.white, fontSize: 20)),
+        title: Text(
+          widget.selectedCategory,
+          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildQuestionSection(),
-            _buildAnswerButton(true, Colors.green),
-            _buildAnswerButton(false, Colors.red),
-            _buildScoreKeeper(),
-          ],
+        child: Container(
+          decoration: BoxDecoration(
+            image: backgroundImage.isNotEmpty
+                ? DecorationImage(
+              image: AssetImage(backgroundImage),
+              fit: BoxFit.cover,
+            )
+                : null,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildQuestionSection(),
+              _buildAnswerButton(true, Colors.green, 'True'),
+              _buildAnswerButton(false, Colors.red, 'False'),
+              _buildScoreKeeper(),
+            ],
+          ),
         ),
       ),
     );
@@ -95,18 +117,43 @@ class _QuizPageState extends State<QuizPage> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Center(
-        child: Text(triviaManager.getQuestionText(), style: const TextStyle(fontSize: 22.0, color: Colors.white), textAlign: TextAlign.center),
+        child: Text(
+          triviaManager.getQuestionText(),
+          style: const TextStyle(
+            fontSize: 24.0,
+            color: Colors.white,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
 
-  Widget _buildAnswerButton(bool isTrue, Color color) {
+  Widget _buildAnswerButton(bool isTrue, Color color, String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: TextButton(
-        style: TextButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.all(15.0)),
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 15.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 6,
+        ),
         onPressed: () => checkAnswer(isTrue),
-        child: Text(isTrue ? 'True' : 'False', style: const TextStyle(color: Colors.white, fontSize: 18.0)),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
       ),
     );
   }
@@ -114,7 +161,10 @@ class _QuizPageState extends State<QuizPage> {
   Widget _buildScoreKeeper() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: scoreKeeper),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: scoreKeeper,
+      ),
     );
   }
 }
