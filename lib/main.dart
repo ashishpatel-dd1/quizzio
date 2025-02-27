@@ -9,7 +9,7 @@ void main() {
 
   // Lock the app in portrait mode
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp, // Allow only portrait mode
+    DeviceOrientation.portraitUp,
   ]).then((_) {
     runApp(const Quizzio());
   });
@@ -25,7 +25,6 @@ class Quizzio extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
         elevatedButtonTheme: ElevatedButtonThemeData(
-
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurpleAccent,
             foregroundColor: Colors.white,
@@ -34,11 +33,79 @@ class Quizzio extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomeScreen(),
+      home: const SplashScreen(), // Start with SplashScreen
     );
   }
 }
 
+// Splash Screen with Animated Logo
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..forward();
+
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack, // Smooth bounce effect
+    );
+
+    // Transition to HomeScreen after 3 seconds
+    Timer(const Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black, // Match theme
+      body: Center(
+        child: ScaleTransition(
+          scale: _animation,
+          child: const Icon(
+            Icons.quiz,
+            size: 120,
+            color: Colors.deepPurpleAccent,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Main Home Screen
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -81,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // 1️⃣ Animated Color Gradient
+          // Animated Color Gradient
           AnimatedContainer(
             duration: const Duration(seconds: 3),
             curve: Curves.easeInOut,
@@ -96,37 +163,52 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // 2️⃣ Floating Particles Animation
+          // Floating Particles Animation
           const AnimatedParticlesBackground(),
-          // 3️⃣ Foreground Content
+          // Foreground Content with Staggered Animation
           SafeArea(
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.quiz, size: 100, color: Colors.white),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Welcome to Quizzio!',
-                    style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Test your knowledge in various categories',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const CategorySelectionPage()),
-                      );
-                    },
-                    child: const Text('Start Quiz', style: TextStyle(fontSize: 18)),
-                  ),
-                ],
+              child: TweenAnimationBuilder(
+                duration: const Duration(seconds: 1),
+                tween: Tween<double>(begin: 0, end: 1),
+                curve: Curves.easeOut,
+                builder: (context, double value, child) {
+                  return Transform.scale(
+                    scale: 0.9 + (0.1 * value),
+                    child: Opacity(opacity: value, child: child),
+                  );
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.quiz, size: 100, color: Colors.white),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Welcome to Quizzio!',
+                      style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Test your knowledge in various categories',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CategorySelectionPage()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        elevation: 5,
+                        shadowColor: Colors.deepPurpleAccent,
+                      ),
+                      child: const Text('Start Quiz', style: TextStyle(fontSize: 18)),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
